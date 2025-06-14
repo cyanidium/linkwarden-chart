@@ -1,0 +1,23 @@
+{{- if .Values.persistence.enabled }}
+{{- if not .Values.persistence.existingClaim }}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include "linkwarden.name" . }}-data
+  labels:
+    {{- include "linkwarden.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/resource-policy: keep
+    {{- with .Values.persistence.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  accessModes:
+    - {{ default "ReadWriteOnce" .Values.persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ default "10Gi" .Values.persistence.size | quote }}
+  storageClassName: "{{ .Values.persistence.storageClass }}"
+{{- end }}
+{{- end }}

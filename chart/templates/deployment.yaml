@@ -1,0 +1,119 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "linkwarden.fullname" . }}-core
+  labels:
+    app.kubernetes.io/component: core
+    {{- include "linkwarden.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: core
+      {{- include "linkwarden.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app.kubernetes.io/component: core
+        {{- include "linkwarden.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: core
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ default "Always" .Values.image.pullPolicy }}
+          envFrom:
+            - secretRef:
+                name: {{ if empty .Values.nextAuthSecret }}nextauth-secret{{ else }}{{ .Values.nextAuthSecret }}{{ end }}
+            - secretRef:
+                name: {{ .Values.meilisearch.auth.existingMasterKeySecret }}
+            {{- if and .Values.core .Values.core.extraEnvSecrets }}
+            {{- range $secret := .Values.core.extraEnvSecrets }}
+            - secretRef:
+                name: {{ $secret }}
+            {{- end }}
+            {{- end }}
+          env:
+            - name: MEILI_HOST
+              value: http://{{ include "linkwarden.fullname" . }}-meilisearch:7700
+            - name: NEXTAUTH_URL
+              value: {{ include "linkwarden.nextAuthURL" . | quote }}
+            {{- if .Values.database.enable }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: linkwarden-db-app
+                  key: uri
+            {{- end }}
+            {{- with .Values.core.extraEnv }}
+            {{- range $key, $value := . }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            timeoutSeconds: 2
+            periodSeconds: 10
+            failureThreshold: 30  # Initial migrations may take a while
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data/data
+              subPath: data
+            {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{ else }}{{ include "linkwarden.name" . }}-data{{ end }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        {{- with .Values.volumes }}
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

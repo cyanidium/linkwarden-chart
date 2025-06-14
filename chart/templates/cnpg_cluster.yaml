@@ -1,0 +1,13 @@
+{{- if .Values.database.enable }}
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: linkwarden-db
+spec:
+  instances: {{ .Values.database.instances }}
+  {{- with .Values.database.storage }}
+  storage:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

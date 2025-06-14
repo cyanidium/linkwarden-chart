@@ -1,0 +1,101 @@
+---
+replicaCount: 1
+image:
+  repository: ghcr.io/linkwarden/linkwarden
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+podLabels: {}
+
+ingress:
+  enabled: false
+  className: ""
+  annotations:
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts: []
+    # - host: linkwarden.example.com
+    #   paths:
+    #     - path: /
+    #       pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: linkwarden-tls
+  #    hosts:
+  #      - linkwarden.example.com
+httpRoute:
+  enabled: false
+  redirectHttpToHttps: true
+  parentRefsHttp:
+    - name: gateway
+  parentRefsHttps:
+    - name: gateway
+  hostnames:
+    - linkwarden.example.com
+
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+persistence:
+  enabled: true
+  # existingClaim: claimName
+  accessMode: ReadWriteOnce
+  size: 10Gi
+  storageClass: ""
+  annotations:
+    helm.sh/resource-policy: keep
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+################################################################################
+# https://docs.linkwarden.app/self-hosting/environment-variables
+
+#baseUrl: https://linkwarden.example.com
+
+core:
+  extraEnv:
+    NEXT_PUBLIC_DISABLE_REGISTRATION: "true"
+  #extraEnvSecrets:
+  #  - oidc-secret
+  #  - database-secret
+
+# If not creating a database using cnpg, then you must provide DATABASE_URL
+# using a secret in core.extraEnvSecrets or linkwarden will not start.
+# https://docs.linkwarden.app/self-hosting/installation#3-configure-the-environment-variables
+database:
+  enable: true
+  instances: 1
+
+meilisearch:
+  auth:
+    existingMasterKeySecret: meilisearch-secret  # pragma: allowlist secret
+  environment:
+    MEILI_ENV: production
+  persistence:
+    enabled: true
