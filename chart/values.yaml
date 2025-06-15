@@ -66,8 +66,6 @@ persistence:
   accessMode: ReadWriteOnce
   size: 10Gi
   storageClass: ""
-  annotations:
-    helm.sh/resource-policy: keep
 
 nodeSelector: {}
 tolerations: []
