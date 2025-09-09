@@ -1,10 +1,9 @@
 ---
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files
-      - id: check-byte-order-marker
       - id: check-case-conflict
       - id: check-executables-have-shebangs
       - id: check-merge-conflict
@@ -52,7 +51,7 @@ repos:
     hooks:
       - id: markdownlint
   - repo: https://github.com/gruntwork-io/pre-commit
-    rev: v0.1.29
+    rev: v0.1.30
     hooks:
       - id: helmlint
   - repo: https://github.com/Yelp/detect-secrets
@@ -60,6 +59,6 @@ repos:
     hooks:
       - id: detect-secrets
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.27.2
+    rev: v8.28.0
     hooks:
       - id: gitleaks
