@@ -3,8 +3,8 @@ apiVersion: v2
 name: linkwarden
 description: A Helm chart for [Linkwarden](https://linkwarden.app/)
 type: application
-version: 0.1.21
-appVersion: "v2.13.4"
+version: 0.1.22
+appVersion: "v2.13.5"
 
 dependencies:
   - name: meilisearch
