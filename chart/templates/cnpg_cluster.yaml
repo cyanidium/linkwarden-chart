@@ -6,6 +6,10 @@ metadata:
   name: linkwarden-db
 spec:
   instances: {{ .Values.database.instances }}
+  {{- with .Values.database.imageCatalogRef }}
+  imageCatalogRef:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   {{- with .Values.database.storage }}
   storage:
     {{- toYaml . | nindent 4 }}

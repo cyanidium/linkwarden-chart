@@ -89,6 +89,11 @@ core:
 database:
   enable: true
   instances: 1
+#  imageCatalogRef:
+#    apiGroup: postgresql.cnpg.io
+#    kind: ClusterImageCatalog
+#    name: postgresql-system-trixie
+#    major: 17
 
 meilisearch:
   command:
