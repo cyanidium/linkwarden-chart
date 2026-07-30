@@ -3,7 +3,7 @@ apiVersion: v2
 name: linkwarden
 description: A Helm chart for [Linkwarden](https://linkwarden.app/)
 type: application
-version: 0.1.46
+version: 0.1.47
 appVersion: "v2.16.0"
 
 dependencies:
