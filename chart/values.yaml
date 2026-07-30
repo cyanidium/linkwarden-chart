@@ -96,9 +96,6 @@ database:
 #    major: 17
 
 meilisearch:
-  command:
-    - /bin/meilisearch
-    - --experimental-dumpless-upgrade
   auth:
     existingMasterKeySecret: meilisearch-secret  # pragma: allowlist secret
   environment:
