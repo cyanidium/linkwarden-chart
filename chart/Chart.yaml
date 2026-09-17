@@ -3,10 +3,10 @@ apiVersion: v2
 name: linkwarden
 description: A Helm chart for [Linkwarden](https://linkwarden.app/)
 type: application
-version: 0.1.52
+version: 0.1.53
 appVersion: "v2.16.3"
 
 dependencies:
   - name: meilisearch
-    version: 0.38.0
+    version: 0.39.0
     repository: https://meilisearch.github.io/meilisearch-kubernetes
